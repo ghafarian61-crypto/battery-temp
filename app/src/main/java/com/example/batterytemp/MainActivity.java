@@ -1,22 +1,33 @@
 package com.example.batterytemp;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import java.util.Locale;
-
+/** Full-screen black page showing the battery temperature, closes itself after 1 second. */
 public class MainActivity extends Activity {
 
-    private static final String NOTIF_PERMISSION = "android.permission.POST_NOTIFICATIONS";
+    private static final long SHOW_MILLIS = 1000;
+
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable closer = new Runnable() {
+        @Override
+        public void run() {
+            finish();
+        }
+    };
 
     private TextView tempText;
 
@@ -24,41 +35,24 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int pad = (int) (24 * getResources().getDisplayMetrics().density);
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(pad, pad * 2, pad, pad);
-        root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(Color.BLACK);
 
         tempText = new TextView(this);
-        tempText.setTextSize(28);
         tempText.setGravity(Gravity.CENTER);
+        tempText.setTypeface(Typeface.DEFAULT_BOLD);
+        tempText.setIncludeFontPadding(false);
+        tempText.setTextColor(Color.WHITE);
+        tempText.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        tempText.setAutoSizeTextTypeUniformWithConfiguration(
+                40, 600, 2, TypedValue.COMPLEX_UNIT_SP);
         root.addView(tempText);
 
-        TextView info = new TextView(this);
-        info.setTextSize(16);
-        info.setPadding(0, pad, 0, pad);
-        info.setText(R.string.main_info);
-        root.addView(info);
-
-        Button battery = new Button(this);
-        battery.setText(R.string.btn_battery);
-        battery.setOnClickListener(v -> {
-            try {
-                startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
-            } catch (Exception e) {
-                startActivity(new Intent(Settings.ACTION_SETTINGS));
-            }
-        });
-        root.addView(battery);
-
         setContentView(root);
+        hideSystemBars();
 
-        if (Build.VERSION.SDK_INT >= 33
-                && checkSelfPermission(NOTIF_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{NOTIF_PERMISSION}, 1);
-        }
-
+        // Make sure the background service that refreshes the widget is running.
         MonitorService.start(this);
     }
 
@@ -66,12 +60,52 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         float t = BatteryWidgetProvider.readTemperature(this);
-        if (Float.isNaN(t)) {
-            tempText.setText("--");
-        } else {
-            tempText.setText(String.format(Locale.US, "%.1f°C", t));
+        tempText.setText(BatteryWidgetProvider.textFor(t));
+        if (!Float.isNaN(t)) {
             tempText.setTextColor(BatteryWidgetProvider.colorFor(t));
         }
         BatteryWidgetProvider.updateAll(this);
+
+        handler.removeCallbacks(closer);
+        handler.postDelayed(closer, SHOW_MILLIS);
+    }
+
+    @Override
+    protected void onPause() {
+        handler.removeCallbacks(closer);
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        handler.removeCallbacks(closer);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) hideSystemBars();
+    }
+
+    @SuppressWarnings("deprecation")
+    private void hideSystemBars() {
+        if (Build.VERSION.SDK_INT >= 30) {
+            getWindow().setDecorFitsSystemWindows(false);
+            WindowInsetsController c = getWindow().getInsetsController();
+            if (c != null) {
+                c.hide(WindowInsets.Type.systemBars());
+                c.setSystemBarsBehavior(
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
     }
 }

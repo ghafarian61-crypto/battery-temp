@@ -10,13 +10,12 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.widget.RemoteViews;
 
-import java.util.Locale;
-
 public class BatteryWidgetProvider extends AppWidgetProvider {
 
-    private static final int COLOR_GREEN = 0xFF2ECC71;   // 0..30
+    private static final int COLOR_BLUE = 0xFF29B6F6;    // 0..20
+    private static final int COLOR_YELLOW = 0xFFFFEB3B;  // 21..30
     private static final int COLOR_ORANGE = 0xFFFF9800;  // 31..40
-    private static final int COLOR_RED = 0xFFF44336;     // 41..50 and above
+    private static final int COLOR_RED = 0xFFF44336;     // 41..100
     private static final int COLOR_UNKNOWN = 0xFF9E9E9E;
 
     @Override
@@ -43,9 +42,15 @@ public class BatteryWidgetProvider extends AppWidgetProvider {
 
     static int colorFor(float celsius) {
         int rounded = Math.round(celsius);
-        if (rounded <= 30) return COLOR_GREEN;
+        if (rounded <= 20) return COLOR_BLUE;
+        if (rounded <= 30) return COLOR_YELLOW;
         if (rounded <= 40) return COLOR_ORANGE;
         return COLOR_RED;
+    }
+
+    static String textFor(float celsius) {
+        if (Float.isNaN(celsius)) return "--";
+        return String.valueOf(Math.round(celsius));
     }
 
     static void updateAll(Context context) {
@@ -57,14 +62,9 @@ public class BatteryWidgetProvider extends AppWidgetProvider {
 
         float temp = readTemperature(app);
         RemoteViews views = new RemoteViews(app.getPackageName(), R.layout.widget_battery);
-        if (Float.isNaN(temp)) {
-            views.setTextViewText(R.id.temp_value, "--");
-            views.setTextColor(R.id.temp_value, COLOR_UNKNOWN);
-        } else {
-            views.setTextViewText(R.id.temp_value,
-                    String.format(Locale.US, "%.1f°", temp));
-            views.setTextColor(R.id.temp_value, colorFor(temp));
-        }
+        views.setTextViewText(R.id.temp_value, textFor(temp));
+        views.setTextColor(R.id.temp_value,
+                Float.isNaN(temp) ? COLOR_UNKNOWN : colorFor(temp));
 
         Intent open = new Intent(app, MainActivity.class);
         PendingIntent pi = PendingIntent.getActivity(app, 0, open,

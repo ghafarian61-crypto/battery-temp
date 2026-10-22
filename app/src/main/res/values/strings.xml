@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Battery Temp Widget</string>
-    <string name="widget_label">دمای باتری</string>
+    <string name="app_name">Battery Temp</string>
     <string name="channel_name">Battery temperature monitor</string>
     <string name="notif_title">ویجت دمای باتری فعال است</string>
-    <string name="btn_battery">تنظیمات بهینه‌سازی باتری</string>
-    <string name="main_info">سرویس دمای باتری فعال شد.\n\nحالا روی صفحه اصلی گوشی، جای خالی را نگه دارید، گزینه Widgets را بزنید و «Battery Temp Widget» را اضافه کنید.\n\nبرای اینکه سیستم سرویس را نبندد، اجازه نمایش اعلان را بدهید و با دکمه زیر، بهینه‌سازی باتری این برنامه را روی «بدون محدودیت» بگذارید.\n\nرنگ‌ها: ۰ تا ۳۰ سبز، ۳۱ تا ۴۰ نارنجی، ۴۱ تا ۵۰ قرمز.</string>
 </resources>
