@@ -43,10 +43,14 @@ public class MainActivity extends Activity {
         tempText.setTypeface(Typeface.DEFAULT_BOLD);
         tempText.setIncludeFontPadding(false);
         tempText.setTextColor(Color.WHITE);
+        // One single line only, so the digits are never split onto separate lines.
+        tempText.setSingleLine(true);
+        tempText.setMaxLines(1);
+        tempText.setHorizontallyScrolling(false);
         tempText.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         tempText.setAutoSizeTextTypeUniformWithConfiguration(
-                40, 600, 2, TypedValue.COMPLEX_UNIT_SP);
+                40, 900, 2, TypedValue.COMPLEX_UNIT_SP);
         root.addView(tempText);
 
         setContentView(root);

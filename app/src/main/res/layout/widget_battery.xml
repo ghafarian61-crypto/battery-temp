@@ -11,6 +11,8 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:includeFontPadding="false"
+        android:maxLines="1"
+        android:singleLine="true"
         android:text="--"
         android:textColor="#FFFFFF"
         android:textSize="48sp"
