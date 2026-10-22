@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Battery Temp</string>
-    <string name="channel_name">Battery temperature monitor</string>
-    <string name="notif_title">ویجت دمای باتری فعال است</string>
+    <string name="channel_name">Battery temperature</string>
+    <string name="notif_title">دمای باتری</string>
 </resources>

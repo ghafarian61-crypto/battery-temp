@@ -10,6 +10,8 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.widget.RemoteViews;
 
+import java.util.Locale;
+
 public class BatteryWidgetProvider extends AppWidgetProvider {
 
     private static final int COLOR_BLUE = 0xFF29B6F6;    // 0..20
@@ -40,6 +42,7 @@ public class BatteryWidgetProvider extends AppWidgetProvider {
         return raw / 10f;
     }
 
+    /** The colour band is decided from the rounded whole number. */
     static int colorFor(float celsius) {
         int rounded = Math.round(celsius);
         if (rounded <= 20) return COLOR_BLUE;
@@ -48,11 +51,13 @@ public class BatteryWidgetProvider extends AppWidgetProvider {
         return COLOR_RED;
     }
 
+    /** Text shown to the user: one decimal digit, e.g. 31.5 */
     static String textFor(float celsius) {
         if (Float.isNaN(celsius)) return "--";
-        return String.valueOf(Math.round(celsius));
+        return String.format(Locale.US, "%.1f", celsius);
     }
 
+    /** Redraws every placed widget with the current temperature. */
     static void updateAll(Context context) {
         Context app = context.getApplicationContext();
         AppWidgetManager manager = AppWidgetManager.getInstance(app);

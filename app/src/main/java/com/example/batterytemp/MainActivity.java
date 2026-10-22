@@ -25,7 +25,8 @@ public class MainActivity extends Activity {
     private final Runnable closer = new Runnable() {
         @Override
         public void run() {
-            finish();
+            // Close the page and remove it from the recent-apps list completely.
+            finishAndRemoveTask();
         }
     };
 
