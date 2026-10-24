@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="4dp">
-
     <TextView
         android:id="@+id/temp_value"
         android:layout_width="match_parent"
@@ -13,6 +12,7 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:singleLine="true"
+        android:ellipsize="none"
         android:text="--"
         android:textColor="#FFFFFF"
         android:textSize="48sp"
@@ -21,9 +21,5 @@
         android:shadowDx="0"
         android:shadowDy="1"
         android:shadowRadius="6"
-        android:autoSizeTextType="uniform"
-        android:autoSizeMinTextSize="16sp"
-        android:autoSizeMaxTextSize="160sp"
-        android:autoSizeStepGranularity="2sp" />
-
+         />
 </FrameLayout>
